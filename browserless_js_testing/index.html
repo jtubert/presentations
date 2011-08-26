@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!--[if gte IE 9]>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <![endif]-->
+    
+    <!--[if lt IE 9]>
+      <meta http-equiv="X-UA-Compatible" content="IE=edge;chrome=1" />
+    <![endif]-->
+
+    <meta charset="utf-8" />
+    <title>Browserless JavaScript Testing</title>
+    <link href="http://fonts.googleapis.com/css?family=Droid+Sans|Droid+Sans+Mono" rel="stylesheet" type="text/css" />
+
+	<!--http://google-code-prettify.googlecode.com/svn/trunk/README.html-->
+	<link href="css/prettify.css" type="text/css" rel="stylesheet" />
+	<link href="css/slides.css" type="text/css" rel="stylesheet" />
+	<script type="text/javascript" src="js/prettify.js"></script>
+	 
+
+	</head>
+  <body onload="prettyPrint()">
+    <div class="presentation">
+      <div id="presentation-counter"></div>
+      <div class="slides">
+        
+                
+        <div class="slide">
+          <style>
+            .intro h1, .intro h2 {
+              color: black;
+            }
+            .intro h1 {
+              letter-spacing: -2px;
+              font-size: 96px;
+            }
+            .intro h2 {
+              margin-top: -5px;
+              font-size: 40px;
+              letter-spacing: -1px;
+            }
+          </style>
+          <section class="middle intro">
+            <hgroup>
+              <h1>
+                Browserless
+              </h1>
+              <h2>
+                JavaScript Testing
+              </h2>
+            </hgroup>
+            <p>by John Tubert</p>
+          </section>
+        </div>
+
+		<div class="slide">
+			<header><h1>Goal</h1></header>
+	 		<section>
+			The goal is simple: Run a series of test of javascript code with each commit. 
+			</section>    
+		</div>
+		
+		<div class="slide">
+			<header><h1>What you will need:</h1></header>
+			<section>
+	            <ul class="summary">
+					<li><b>QUnit</b> - a javascript framework for unit testing</li>
+					<li><b>Rhino</b> - a javascript engine</li>
+					<li><b>EnvJS</b> - console browser (AKA: headless browser)</li>
+					<li><b>Ant</b> - a java build tool</li>
+					<li><b>Maven</b> - a tool for project management and build automation</li>
+					<li><b>Hudson</b> - is Continuous Integration Server.</li>
+					<li><b>SVN</b> - a software versioning system</li>
+				</ul>
+        	</section>
+		</div>
+		
+		<div class="slide">
+			<header><h1>Unit testing</h1></header>
+	 		<section>
+		    	Websites are getting more and more complex, So even small sites and RIAs can contain 100s lines of Javascript code. With the complexity growing, the number of bugs grows so writing clean code and lots of testing will help minimize this.
+				With unit testing we can test individual units of source code to determine if it can be used in the application. Unit testing is very common on software development but not as common on web development.
+				
+				<pre class="prettyprint">
+ok( state, message )	
+//A boolean assertion, equivalent to JUnit's assertTrue. Passes if the first argument is truthy.
+
+equal( actual, expected, message )	
+//A comparison assertion, equivalent to JUnit's assertEquals.
+
+notEqual( actual, expected, message )	
+//A comparison assertion, equivalent to JUnit's assertNotEquals.
+
+deepEqual( actual, expected, message )	
+//A deep recursive comparison assertion, working on primitive types, arrays and objects.
+
+notDeepEqual( actual, expected, message )	
+//A deep recursive comparison assertion, working on primitive types, arrays and objects, 
+//with the result inverted, passing when some property isn't equal.
+
+strictEqual( actual, expected, message )	
+//A stricter comparison assertion then equal.
+
+notStrictEqual( actual, expected, message )	
+//A stricter comparison assertion then notEqual.
+
+raises( block, expected, message )	
+//Assertion to test if a callback throws an exception when run.
+				</pre>
+			</section> 
+			<section>
+				
+			</section>    
+		</div>
+		
+		
+		
+		<div class="slide">
+			<header><h1>Javascript engine</h1></header>
+	 		<section>
+		    	In order to run these units tests outside the browser I need a javascript interpreter that can run the code and the tests. There are many alternatives out there like Rhino, PhantomJS, SpiderMonkey and V8. SpiderMonkey is the engine that runs behind firefox, written in C/C++ and V8 it’s also written in C++ and it’s used in google chrome. These engines are great because they allow you to run javascript code on the server or command-line but they do not have build in capabilities to manipulate HTML documents or the DOM.
+		<pre class="prettyprint">
+//on validateEmail.js
+function validateEmail(email) {	
+	var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+	return filter.test(email);	
+}
+
+print("john.tubert@rga.com: "+validateEmail("john.tubert@rga.com"));
+print("john.tubertrga.com: "+validateEmail("john.tubertrga.com"));
+
+//on console
+
+//this will generate the the class file (validateEmail.class)
+java org.mozilla.javascript.tools.jsc.Main validateEmail.js
+
+//run the java
+java validateEmail
+
+//will output
+john.tubert@rga.com: true
+john.tubertrga.com: false
+
+		</pre>
+		
+			</section>      
+		</div>
+		
+		<div class="slide">
+          <style>
+            .intro h1, .intro h2 {
+              color: black;
+            }
+            .intro h1 {
+              letter-spacing: -2px;
+              font-size: 96px;
+            }
+            .intro h2 {
+              margin-top: -5px;
+              font-size: 40px;
+              letter-spacing: -1px;
+            }
+          </style>
+          <section class="middle intro">
+            <hgroup>
+              <h1>
+                DEMO
+              </h1>
+			</hgroup>
+			</section>
+        </div>
+
+		<div class="slide">
+			<header><h1>Console/Headless browser</h1></header>
+	 		<section>
+				A headless browser is a browser without a view (or GUI) but it’s capable of parse javascript, click on links, load images, determine text color, etc. All these can be done from a console, so it can be used to run tests on the server as well. I been looking into EnvJS, but there are others like ZombieJS.
+			<pre class="prettyprint lang-html">
+
+&lt;html&gt;
+&lt;head&gt;
+	&lt;meta http-equiv="Content-Type" content="text/html; charset=utf-8"&gt;
+	&lt;title&gt;validateEmail&lt;/title&gt;
+
+&lt;/head&gt;
+&lt;body&gt;
+	emailaddress: &lt;input id="emailaddress" type="text" name="emailaddress" value="john.tubertrga.com"/&gt;&lt;br /&gt;
+
+	&lt;script&gt;
+		function checkEmail() {
+			var email = document.getElementById('emailaddress');
+			var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+			if (!filter.test(email.value)) {
+				console.log('Please provide a valid email address');
+				email.focus;
+				return false;
+			}
+		}
+		checkEmail();
+
+	&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
+			</pre>
+			</section>   
+		</div>
+		
+		<div class="slide">
+          <style>
+            .intro h1, .intro h2 {
+              color: black;
+            }
+            .intro h1 {
+              letter-spacing: -2px;
+              font-size: 96px;
+            }
+            .intro h2 {
+              margin-top: -5px;
+              font-size: 40px;
+              letter-spacing: -1px;
+            }
+          </style>
+          <section class="middle intro">
+            <hgroup>
+              <h1>
+                DEMO
+              </h1>
+			</hgroup>
+			</section>
+        </div>
+		
+		
+		<div class="slide">
+		      <header><h1>envjs_init.js</h1></header>
+		      <section>
+		<pre class="prettyprint">		
+load("../js_tests/lib/env_rhino.js");
+load("http://code.jquery.com/qunit/qunit-git.js");
+
+QUnit.init();
+QUnit.config.blocking = false;
+QUnit.config.autorun = true;
+QUnit.config.updateRate = 0;
+QUnit.log = function(object) {
+	print(object.result ? 'PASS' : 'FAIL', object.message);
+};
+
+//load html to test
+window.location = "../index.html";
+
+load("../js_tests/Puzzle-tests2.js");
+		</pre>
+		</section>
+		</div>
+		
+		<div class="slide">
+			<style>
+				.prettyprint{
+					font-size: 12px;
+				}
+			</style>
+			<header><h1>Puzzle-tests2.js</h1></header>
+			<section>
+			<pre class="prettyprint">
+
+test("constructor tests", function() {
+	equal( puzzle.usePhpProxy, false, "usePhpProxy is false" );
+	if(com.jtubert.Puzzle.Utils.getUrlVars().level){
+		equal( !isNaN(Number(com.jtubert.Puzzle.Utils.getUrlVars().level)), true, "level is a number" );
+	}else{
+		equal( com.jtubert.Puzzle.Utils.getUrlVars().level == undefined, true, "a level is not passed in the url" );
+	}
+
+	if (com.jtubert.Puzzle.Utils.getUrlVars().url) {
+        equal(com.jtubert.Puzzle.Utils.getUrlVars().url.indexOf("http://") == 0, true, "external image" );
+    }else{
+		equal( com.jtubert.Puzzle.Utils.getUrlVars().url == undefined, true, "a url is not passed in the url" );
+	}
+
+});
+
+			</pre>
+			</section>
+			</div>
+
+				<!--http://www.prettyprinter.de/module.php?name=PrettyPrinter-->
+
+				<div class="slide">
+				      <header><h1>build.xml</h1></header>
+				      <section>
+						<pre class="prettyprint">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;project name="Puzzle build" default="build" basedir=".\"&gt;
+	&lt;target name="js-tests-rhino"&gt;
+		&lt;apply dir="." executable="java" parallel="false" failonerror="true"&gt;
+			&lt;fileset dir="../js_tests/lib/"&gt;
+				&lt;include name="envjs_init.js"/&gt;
+			&lt;/fileset&gt;
+			&lt;arg value="-jar" /&gt;
+			&lt;arg path="../js_tests/lib/rhino.jar" /&gt;
+		&lt;/apply&gt;
+	&lt;/target&gt;
+&lt;/project&gt;
+					</pre></section>
+				</div>
+				
+				
+				<div class="slide">
+					<header><h1>Running the build</h1></header>
+			 		<section>
+						<img src="img/console.png">
+					</section>   
+				</div>
+
+				<div class="slide">
+				      <header><h1>pom.xml</h1></header>
+					<section>
+				      <pre class="prettyprint">
+&lt;project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+	&lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+	&lt;artifactId&gt;puzzle&lt;/artifactId&gt;
+	&lt;groupId&gt;puzzle-group&lt;/groupId&gt;
+	&lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;
+	&lt;build&gt;
+		&lt;plugins&gt;
+			&lt;plugin&gt;
+				&lt;artifactId&gt;maven-antrun-plugin&lt;/artifactId&gt;
+				&lt;executions&gt;
+					&lt;execution&gt;
+						&lt;phase&gt;test&lt;/phase&gt;
+						&lt;configuration&gt;
+							&lt;tasks&gt;
+								&lt;echo message="Call ant file."/&gt;
+								&lt;ant antfile="build.xml" target="build"/&gt;
+							&lt;/tasks&gt;
+						&lt;/configuration&gt;
+						&lt;goals&gt;
+							&lt;goal&gt;run&lt;/goal&gt;
+						&lt;/goals&gt;
+					&lt;/execution&gt;
+				&lt;/executions&gt;
+			&lt;/plugin&gt;
+		&lt;/plugins&gt;
+	&lt;/build&gt;
+&lt;/project&gt;
+			</pre>
+			</section>
+			</div>	
+			
+			
+				<div class="slide">
+					<header><h1>Hudson</h1></header>
+			 		<section>
+						<img src="img/hudson2.png">
+					</section>   
+				</div>
+				
+				<div class="slide">
+					<header><h1>Hudson</h1></header>
+			 		<section>
+						<img src="img/hudson3.png">
+					</section>   
+				</div>
+				
+				<div class="slide">
+		          <style>
+		            .intro h1, .intro h2 {
+		              color: black;
+		            }
+		            .intro h1 {
+		              letter-spacing: -2px;
+		              font-size: 96px;
+		            }
+		            .intro h2 {
+		              margin-top: -5px;
+		              font-size: 40px;
+		              letter-spacing: -1px;
+		            }
+		          </style>
+		          <section class="middle intro">
+		            <hgroup>
+		              <h1>
+		                DEMO
+		              </h1>
+					</hgroup>
+					</section>
+		        </div>
+
+			<div class="slide contentslide">
+				<header><h1>Resources</h1></header>
+				<section>
+				<h2>Unit testing</h2>
+				<ul>
+				<li>Qunit - http://docs.jquery.com/Qunit </li>
+				<li>JSAssertUnit - http://jsassertunit.sourceforge.net/docs/tutorial.html</li>
+				<li>JSUnit - http://www.jsunit.net/</li>
+				<li>RhinoUnit - http://code.google.com/p/rhinounit/</li> 
+				<li>Others: http://en.wikipedia.org/wiki/List_of_unit_testing_frameworks#JavaScript</li>
+				</ul> 
+				<h2>Javascript Engine</h2>
+				<ul>
+				<li>Rhino - https://developer.mozilla.org/en/Rhino </li>
+				<li>PhantomJS - http://www.phantomjs.org/</li> 
+				<li>SpiderMonkey - https://developer.mozilla.org/en/SpiderMonkey </li>
+				<li>V8 - http://code.google.com/p/v8/</li>
+				<li>Others: http://en.wikipedia.org/wiki/List_of_JavaScript_engines</li>
+				</ul> 
+				<h2>Console browser</h2>
+				<ul>
+				<li>EnvJS - http://www.envjs.com/</li> 
+				<li>ZombieJS - http://zombie.labnotes.org/</li>
+				</ul>
+				</section>
+			</div>
+			
+			<div class="slide">
+	          <style>
+	            .intro h1, .intro h2 {
+	              color: black;
+	            }
+	            .intro h1 {
+	              letter-spacing: -2px;
+	              font-size: 96px;
+	            }
+	            .intro h2 {
+	              margin-top: -5px;
+	              font-size: 40px;
+	              letter-spacing: -1px;
+	            }
+	          </style>
+	          <section class="middle intro">
+	            <hgroup>
+	              <h1>
+	                THANK YOU
+	              </h1>
+				</hgroup>
+				</section>
+	        </div>
+
+
+	
+      </div> <!-- slides -->
+
+    </div> <!-- presentation -->
+
+
+	<script type="text/javascript" src="js/slides.js"></script>
+   	<!--[if lt IE 9]>
+	<script 
+	  src="http://ajax.googleapis.com/ajax/libs/chrome-frame/1/CFInstall.min.js">
+	</script>
+		<script>CFInstall.check({ mode: "overlay" });</script>
+	<![endif]-->
+
+
+
+  </body>
+</html>
