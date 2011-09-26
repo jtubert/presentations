@@ -187,9 +187,125 @@
     </section> 
   </div></div> 
 
-	
+  <div class="slide" id="porting"><div> 
+    <section> 
+      <header> 
+        <h2>How do I port this into Google+ Hangout?</h2> 
+      </header> 
+      <blockquote cite=""> 
+        <p>Now that I have this running on node.js I want to replace node.js with hangout API. Or maybe I can keep node but take advantage of hangout API...</p> 
+      </blockquote>
+    </section> 
+  </div></div>
 
+  <div class="slide" id="hangout"><div> 
+    <section> 
+      <header> 
+        <h2>Steps for putting app on hangout:</h2> 
+      </header> 
+      <ul> 
+        <li>Create gadget xml</li> 
+		<li>Replace node.js calls with hangout API data calls</li> 
+		<li>Enable Hangout API on console</li> 
+		<li>Add more team members if necessary</li> 
+		<li>Enter gadget xml url into hangout tab</li> 
+	  </ul> 
+    </section> 
+  </div></div>
 
+  <style> 
+    #gadget code {font-size:13px;}
+  </style>
+  <div class="slide" id="gadget"><div> 
+    <section> 
+      <header> 
+        <h2>Gadget XML:</h2> 
+      </header> 
+      <pre> 
+        <code>&lt;Module&gt;</code>
+		<code>  &lt;ModulePrefs title="hangout test"&gt;</code>
+		<code>    &lt;Require feature="rpc"/&gt;</code>
+		<code>    &lt;Require feature="views"/&gt;</code>
+		<code>  &lt;/ModulePrefs&gt;</code>
+		<code>  &lt;Content type="html"&gt;</code>
+		<code>  &lt;![CDATA[</code>
+	    <code>  &lt;script src="//hangoutsapi.appspot.com/static/hangout.js"&gt;&lt;/script></code>
+		<code>  <b><font color="red">{YOUR CODE}</font></b></code>
+		<code>  ]]&gt;</code>
+		<code>  &lt;/Content&gt;</code>
+		<code>&lt;/Module&gt;</code>
+	  </pre>
+    </section> 
+  </div></div>
+
+  <style> 
+    #replaceNode code {font-size:10px;}
+  </style>
+  <div class="slide" id="replaceNode"><div> 
+    <section> 
+      <header> 
+        <h2>Replacing node with hangout API:</h2> 
+      </header> 
+      
+      <pre> 
+        <code>//sending data...</code>
+		<code>gapi.hangout.data.submitDelta({name:object});</code>
+		<code>//receiving data...</code>
+		<code>gapi.hangout.data.addStateChangeListener(stateUpdated);</code>
+		<code> </code>
+		<code>function stateUpdated(delta, metadata) {</code>
+		<code>  var remoteDisplayName = gapi.hangout.data.getState()['displayName'];</code>
+		<code>  var remoteParticipantId = gapi.hangout.data.getState()['participantId'];</code>
+		<code>}</code>
+		<code>//getting users</code>
+		<code>var participantId = gapi.hangout.getParticipantId();</code>
+		<code>var participant = gapi.hangout.getParticipantById(participantId);</code>
+		<code>var displayName = participant.displayName;</code>
+		<code>var imageURL = participant.image.url</code>
+	  </pre>
+    </section> 
+  </div></div>
+  
+  <style> 
+  #enable h2, #team h2, #hangout2 h2 {position:relative;left:-100px;bottom:70px;}
+  </style>
+  <div class="slide bg" id="enable"><div> 
+    <section>
+	 	<header> 
+	    	<h2>ENABLE HANGOUT</h2> 
+	    </header>
+		<img src="enable.png">
+    </section> 
+  </div></div>
+
+  <div class="slide bg" id="team"><div> 
+    <section>
+	 	<header> 
+	    	<h2>ADD TEAM MEMBERS</h2> 
+	    </header>
+		<img src="team.png">
+    </section> 
+  </div></div>
+
+  <div class="slide bg" id="hangout2"><div> 
+    <section>
+	 	<header> 
+	    	<h2>ENTER GADGET URL</h2> 
+	    </header>
+		<img src="hangout.png">
+    </section> 
+  </div></div>
+
+  <style> 
+    #showCode2 h2 {font-size:110px;}
+  </style> 
+  <div class="slide shout" id="showCode2"><div> 
+    <section> 
+      <header> 
+        <h2>DEMO</h2> 
+      </header> 
+    </section> 
+  </div></div>
 
   <div class="progress"><div></div></div> 
   <script src="script.js"></script> 
