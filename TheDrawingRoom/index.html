@@ -1,0 +1,197 @@
+<!DOCTYPE HTML> 
+<html lang="en-US"> 
+<head> 
+  <title>The Drawing Room</title> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=1274, user-scalable=no"> 
+  <link rel="stylesheet" href="style.css"> 
+</head> 
+<body class="list"> 
+  <header class="caption"> 
+    <h1>The Drawing Room experiment</h1> 
+    <p>Multiplayer, social drawing application using html5, node.js, and maybe even google+ hangout.</p>
+    <p>by <a href="http://www.twitter.com/jtubert">@jtubert</a></p>
+  </header>
+
+  <style> 
+    #bam a {border:none;}
+  </style>
+  <div class="slide" id="goal"><div> 
+    <section> 
+      <header> 
+        <h2>The Drawing Room experiment</h2> 
+      </header> 
+      <blockquote cite=""> 
+        <p>Goal: Create a multiplayer social realtime drawing room using the latest technologies.</p> 
+      </blockquote>
+    </section> 
+  </div></div>
+  
+  <div class="slide" id="technologies"><div> 
+    <section> 
+      <header> 
+        <h2>Technologies:</h2> 
+      </header> 
+      <ul> 
+        <li>Front-end: HTML5/JS</li> 
+        <li>Back-end: Node.js</li> 
+        <li>Repository: GIT</li> 
+		<li>Hosting: Joyent</li> 
+      </ul> 
+    </section> 
+  </div></div>
+
+  <div class="slide" id="setup"><div> 
+    <section> 
+      <header> 
+        <h2>Setup:</h2> 
+      </header> 
+	  <ul> 
+        <li>Install node.js (mac): https://sites.google.com/site/nodejsmacosx/</li> 
+        <li>Install socketio (using node packet manager): <b>npm install socket.io</b></li> 
+        <li>Install express: <b>npm install express</b></li> 
+		<li>Install gzippo: <b>npm install gzippo</b></li> 
+      </ul>
+    </section> 
+  </div></div>
+
+  <div class="slide" id="server"><div> 
+    <section> 
+      <header> 
+        <h2>server.js:</h2> 
+      </header> 
+	  <ul> 
+		<li>Import necessary libs</li> 
+        <li>Handle static files</li> 
+        <li>Handle socket connections</li>
+      </ul>
+    </section> 
+  </div></div>
+
+  
+  <div class="slide" id="import"><div> 
+    <section> 
+      <header> 
+        <h2>Imports...</h2> 
+      </header> 
+      <pre> 
+        <code>var app = require('express').createServer(),</code> 
+        <code>io = require('socket.io').listen(app), </code> 
+        <code>fs = require('fs'), //file system</code> 
+        <code>gzippo = require('gzippo');</code> 
+      </pre> 
+    </section> 
+  </div></div> 
+
+  <div class="slide" id="static"><div> 
+    <section> 
+      <header> 
+        <h2>Handling static files</h2> 
+      </header> 
+      <pre> 
+        <code>app.use(gzippo.staticGzip(__dirname + '/static'));</code>
+      </pre> 
+    </section> 
+  </div></div>
+
+  <style> 
+    #socket code {font-size:19px;}
+  </style>
+
+  <div class="slide" id="socket"><div> 
+    <section> 
+      <header> 
+        <h2>Socket Connections:</h2> 
+      </header> 
+      <pre> 
+        <code>io.sockets.on('connection', function (socket) {</code>
+		<code>  socket.on('down', function (data) {</code>
+		<code>    socket.get('nickname', function (err, name) {</code>
+		<code>      socket.broadcast.emit('down', { draw: data,nickname:name,socketID:socket.id });</code>
+		<code>    });</code>
+		<code>  });</code>
+		<code>});</code>
+      </pre> 
+    </section> 
+  </div></div>
+
+
+  <div class="slide" id="html"><div> 
+    <section> 
+      <header> 
+        <h2>HTML file:</h2> 
+      </header> 
+      <pre> 
+        <code>&lt;script src="/socket.io/socket.io.js"&gt;&lt;/script&gt;</code>
+		<code>&lt;script type="text/javascript" src="/js/init.js"&gt;&lt;/script&gt;</code>
+		<code>&lt;body&gt;</code>
+		<code>   &lt;canvas class="canvas" id="drawLayer" style='z-index:1'&gt;</canvas></code>
+		<code>&lt;/body&gt;</code>
+      </pre> 
+    </section> 
+  </div></div>
+
+
+  <style> 
+    #jsfile code {font-size:14px;}
+  </style>
+  <div class="slide" id="jsfile"><div> 
+    <section> 
+      <header> 
+        <h2>JS file:</h2> 
+      </header>
+ 	  //Create socket object
+      <pre> 
+        <code>socket = io.connect('http://localhost:8080/');</code>
+	  </pre> 
+	//for each message I want to send...
+      <pre> 
+        <code>socket.emit(name, object);</code>
+	  </pre>
+	
+	//for each message I receive...
+      <pre> 
+        <code>socket.on('down', function (data) {</code>
+		<code>  //handle received data</code>
+		<code>});</code>
+	  </pre>
+ </section> 
+  </div></div>
+
+  <style> 
+    #showCode h2 {font-size:110px;}
+  </style> 
+  <div class="slide shout" id="showCode"><div> 
+    <section> 
+      <header> 
+        <h2><a href="http://thedrawingroom.no.de">DEMO</a></h2> 
+      </header> 
+    </section> 
+  </div></div> 
+
+  <div class="slide" id="resources"><div> 
+    <section> 
+      <header> 
+        <h2>Resources:</h2> 
+      </header> 
+      <ul> 
+        <li><a href="http://nodejs.org/ ">nodejs homepage</a></li> 
+        <li><a href="https://sites.google.com/site/nodejsmacosx/">Node js mac installer</a></li> 
+        <li><a href="http://www.nodebeginner.org/">node tutorial</a></li>
+		<li><a href="http://socket.io/#how-to-use">Socket IO</a></li>
+		<li><a href="http://expressjs.com/">Express</a></li> 
+		<li><a href="https://github.com/tomgallacher/gzippo">GZippo</a></li> 
+		<li><a href="http://no.de">Joyent (node hosting)</a></li> 
+		<li><a href="https://www.dotcloud.com ">DotCloud (node hosting)</a></li> 
+	  </ul> 
+    </section> 
+  </div></div> 
+
+	
+
+
+
+  <div class="progress"><div></div></div> 
+  <script src="script.js"></script> 
+</body> 
+</html>
